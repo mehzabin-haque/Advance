@@ -17,6 +17,10 @@
         },
         "problemMatcher": ["$gcc"]
       }
-    ]
+    ],
+    "files.associations": {
+      "*.embeddedhtml": "html",
+      "vector": "cpp"
+    }
   }
   
