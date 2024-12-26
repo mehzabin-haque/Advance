@@ -1,46 +1,52 @@
-#include <cmath>
-#include <cstdio>
-#include <vector>
-#include <climits>
-#include <iostream>
-#include <algorithm>
+#include<cstdio>
+#include<cmath>
+#include<vector>
+#include<iostream>
+#include<algorithm>
+#include<climits>
 using namespace std;
 
-int solve(int n, vector<vector<int>>&arr, int index, int ini_mask, int total_mask){
+int solve(int n,vector<vector<int>> &matrix, int idx, int ini_mask, int total_mask){
     if(ini_mask==total_mask){
-        return arr[index][0];
+        return matrix[idx][0];
     }
-    int ans=INT_MAX;
+    
+    int ans = INT_MAX;
+    
     for(int i=0;i<n;i++){
         if((ini_mask & (1<<i))==0){
-            int y=(ini_mask | (1<<i));
-            int temp = arr[index][i]+solve(n, arr, i, y , total_mask);
-            ans=min(ans, temp);
+            int y = (ini_mask | (1<<i));
+            int temp = matrix[idx][i]+ solve(n,matrix,i,y,total_mask);
+            ans = min(ans,temp);
         }
     }
+    
     return ans;
 }
 
-
-int main() {
-     
+int main(){
+    
     int t;
     cin>>t;
-    while(t--){
+    
+   
+    
+    for(int i=0;i<t;i++){
         int n;
         cin>>n;
-        vector<vector<int>>arr;
+        vector<vector<int>> matrix(n,vector<int>(n));
+        
         for(int i=0;i<n;i++){
-            vector<int>temp;
             for(int j=0;j<n;j++){
-                int x;
-                cin>>x;
-                temp.push_back(x);
-            } arr.push_back(temp);
+                cin>>matrix[i][j];
+            }
         }
-        int ini_mask=1;
+        
+        int ini_mask=0;
         int total_mask=(1<<n)-1;
-        cout<<solve(n, arr, 0, ini_mask, total_mask)<<endl;
+        cout<<solve(n,matrix,0,ini_mask,total_mask)<<endl;
     }
+    
+   
     return 0;
 }
