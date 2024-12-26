@@ -1,52 +1,42 @@
-#include<iostream>
-#include<cstdio>
-#include<iostream>
-#include<cstdio>
+#include <iostream>
 #include<vector>
-#include<queue>
-#include<queue>
 #include<algorithm>
+#include<climits>
 using namespace std;
+int N;
 
 
-//Function Prototypes
-int calculate_max_score(const vector<int>& ballon_values);
-int calculate_recursively(const vector<int>& ballon_values, vector<vector<int>>& dp, int start, int end);
-
-
-int main(){
-    int number_of_ballons, input;
-    cin>>number_of_ballons;
-    vector<int> ballon_values;
-    ballon_values.push_back(1);
-    for(int i=0; i<number_of_ballons; i++){
-        cin>>input;
-        ballon_values.push_back(input);
+int dp(int start, int end, vector<int> &ballons, vector<vector<int>>&dpMem) {
+    if (start > end) return 0;
+    if (dpMem[start][end] != -1) return dpMem[start][end];
+    int maxAns = INT_MIN;
+    for (int i = start; i <= end; i++) {
+        int cost;
+        if(start-1 ==0 && end+1 == N+1){
+        cost = ballons[i] + 
+            dp(start, i - 1, ballons, dpMem) + dp(i + 1, end, ballons, dpMem);
+        }
+        else {
+            cost = ballons[start - 1] * ballons[end + 1] + 
+            dp(start, i - 1, ballons, dpMem) + dp(i + 1, end, ballons, dpMem);
+        }
+        
+        maxAns = max(cost, maxAns);
     }
-    ballon_values.push_back(1);
-
-    cout << calculate_max_score(ballon_values) << endl;
+    return dpMem[start][end] = maxAns;
 }
 
-int calculate_max_score(const vector<int>& ballon_values){
-    int n = ballon_values.size();
-    vector<vector<int>> dp(n, vector<int>(n,-1));
-
-    return calculate_recursively(ballon_values, dp, 1, n-1);
-}
-
-int calculate_recursively(const vector<int>& ballon_values, vector<vector<int>>& dp, int start, int end){
-    if(start>end) return 0;
-    if(dp[start][end]!=-1) return dp[start][end];
-
-    int max_score = INT_MIN, n=ballon_values.size(), score=0;
-    for(int i=start; i<=end; i++){
-        if(((start-1)==0) && ((end+1)==(n-1))) score = ballon_values[i];
-        else score = ballon_values[start-1]*ballon_values[end+1];
-
-        score += calculate_recursively(ballon_values, dp, start, i-1) + calculate_recursively(ballon_values, dp, i+1, end);
-
-        max_score = max(max_score, score);
+int main()
+{
+    cin >> N;
+    vector<int> ballons(N+2);
+    vector<vector<int>>dpMem(N+2, vector<int>(N+2, -1));
+    for (int i = 1; i <= N; i++) {
+        cin >> ballons[i];
     }
-    return dp[start][end] = max_score;
+    ballons[0] = 1;
+    ballons[N + 1] = 1;
+    int final = dp(1, N, ballons, dpMem);
+    cout << final << endl;
+
 }
