@@ -1,7 +1,5 @@
 #include<iostream>
 #include<cstdio>
-#include<iostream>
-#include<cstdio>
 #include<vector>
 #include<queue>
 #include<queue>
