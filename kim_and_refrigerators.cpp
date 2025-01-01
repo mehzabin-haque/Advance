@@ -1,75 +1,49 @@
-#include<iostream>
-#include<cmath>
 #include<cstdio>
+#include<iostream>
 #include<vector>
 #include<algorithm>
-#include<climits>
+#include<string>
 using namespace std;
 
-// Function Prototypes
-int manhattan_distance(pair<int,int> A, pair<int,int> B);
-int find_minimum_distance(const vector<pair<int,int>>& coordinates);
-int find_cost(int mask, int source, vector<vector<int>>& dp, const vector<vector<int>>& graph);
+int min_dist(vector<pair<int,int>> &coord, int n){
 
+    int dist=0;
+
+    vector<vector<int>> graph(n,vector<int>(n,0));
+
+    for(int i=0;i<n;i++){
+        for(int j=i+1;j<n;j++){
+            graph[i][j] = abs(coord[i].first - coord[j].first) + abs(coord[i].second - coord[j].second);
+            graph[j][i] = graph[i][j];
+        }
+    }
+
+    return dist;
+}
 
 int main(){
-    const int TEST_CASES = 10;
-    for(int tc=1; tc<=TEST_CASES; tc++){
-        int number_of_customers,x,y;
-        cin>>number_of_customers;
-        number_of_customers+=2;
+    int t;
+    cin>>t;
 
-        vector<pair<int,int>> coordinates(number_of_customers);
-        cin>>x>>y;
-        coordinates[0] = {x,y};
-        cin>>x>>y;
-        coordinates[number_of_customers-1] = {x,y};
+    while(t--){
+        int n;
+        cin>>n;
+        n+=2;
+        vector<pair<int,int>> coord(n);
+        int x,y;
+        cin>>x,y;
+        coord[0] = {x,y};
+        int a,b;
+        cin>>a>>b;
+        coord[n-1]={a,b};
 
-        for(int i=1; i<number_of_customers-1; i++){
+        for(int i=1;i<n-1;i++){
+            int x,y;
             cin>>x>>y;
-            coordinates[i] = {x,y};
+            coord[i] = {x,y};
         }
 
-        cout <<"# "<<tc<<" "<<find_minimum_distance(coordinates) << endl;
+        cout<< min_dist(coord,n) << endl;
+
     }
-    return 0;
-}
-
-int find_minimum_distance(const vector<pair<int,int>>& coordinates){
-    int n = coordinates.size(), distance=0;
-    vector<vector<int>> graph(n, vector<int> (n,0));
-
-    for(int i=0; i<n; i++){
-        for(int j=i+1; j<n; j++){
-            distance = manhattan_distance(coordinates[i], coordinates[j]);
-            graph[i][j] = distance;
-            graph[j][i] = distance;
-        }
-    }
-
-    vector<vector<int>> dp(1<<n, vector<int> (n,-1));
-
-    return find_cost(1,0, dp, graph);
-}
-
-int manhattan_distance(pair<int,int> A, pair<int,int> B){
-    return abs(A.first-B.first) + abs(A.second - B.second);
-}
-
-int find_cost(int mask, int source, vector<vector<int>>& dp, const vector<vector<int>>& graph){
-    int n = graph.size();
-    
-    if(mask==((1<<n)-1)) return graph[source][n-1]; // All traversed
-    
-
-    if(dp[mask][source]!=-1) return dp[mask][source];
-
-    int cost = INT_MAX;
-    for(int loc=0; loc<n; loc++){
-        if (!(mask & (1 << loc))) {
-            cost = min(cost, find_cost((mask|(1<<loc)), loc, dp, graph) + graph[source][loc]);
-        }
-    }
-
-    return dp[mask][source] = cost;
 }

@@ -1,42 +1,45 @@
 #include <iostream>
-#include<vector>
-#include<algorithm>
-#include<climits>
+#include <vector>
+#include <climits>
+#include <algorithm>
 using namespace std;
-int N;
 
+int n;
 
-int dp(int start, int end, vector<int> &ballons, vector<vector<int>>&dpMem) {
-    if (start > end) return 0;
-    if (dpMem[start][end] != -1) return dpMem[start][end];
-    int maxAns = INT_MIN;
-    for (int i = start; i <= end; i++) {
-        int cost;
-        if(start-1 ==0 && end+1 == N+1){
-        cost = ballons[i] + 
-            dp(start, i - 1, ballons, dpMem) + dp(i + 1, end, ballons, dpMem);
-        }
-        else {
-            cost = ballons[start - 1] * ballons[end + 1] + 
-            dp(start, i - 1, ballons, dpMem) + dp(i + 1, end, ballons, dpMem);
-        }
-        
-        maxAns = max(cost, maxAns);
-    }
-    return dpMem[start][end] = maxAns;
+int ms(int left, int right, vector<int> &b, vector<vector<int>> &dp)
+{
+  if (left == right)
+    return 0;
+
+  if (dp[left][right] != -1)
+    return dp[left][right];
+
+  int msr = INT_MIN;
+
+  for (int i = left; i < right; i++)
+  {
+    int score;
+    if (left == 1 && right == n + 1)
+      score = b[left - 1] * b[i] * b[right] + ms(left, i, b, dp) + ms(i + 1, right, b, dp);
+    else
+      score = b[left - 1] * b[right] + ms(left, i, b, dp) + ms(i + 1, right, b, dp);
+
+    msr = max(msr, score);
+  }
+
+  return dp[left][right] = msr;
 }
 
 int main()
 {
-    cin >> N;
-    vector<int> ballons(N+2);
-    vector<vector<int>>dpMem(N+2, vector<int>(N+2, -1));
-    for (int i = 1; i <= N; i++) {
-        cin >> ballons[i];
-    }
-    ballons[0] = 1;
-    ballons[N + 1] = 1;
-    int final = dp(1, N, ballons, dpMem);
-    cout << final << endl;
 
+  cin >> n;
+  vector<int> b(n + 2, 1);
+
+  for (int i = 1; i <= n; i++)
+    cin >> b[i];
+
+  vector<vector<int>> dp(n + 2, vector<int>(n + 2, -1));
+
+  cout << ms(1, n + 1, b, dp);
 }
