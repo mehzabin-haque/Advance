@@ -31,7 +31,6 @@ bool dfs(int r,int c, vector<vector<int>> &dp, vector<vector<int>> &vis, vector<
     }
     
     //right
-    
     for(int i=c+1;i<m;i++){
         if(g[r][i]==0){
             break;
@@ -42,7 +41,6 @@ bool dfs(int r,int c, vector<vector<int>> &dp, vector<vector<int>> &vis, vector<
     }
     
     //upward
-    
     for(int i=r-1;i>=0;i--){
         if(g[i][c]==0){
             continue;
@@ -57,7 +55,6 @@ bool dfs(int r,int c, vector<vector<int>> &dp, vector<vector<int>> &vis, vector<
     }
     
     //downward
-    
     for(int i=r+1;i<n;i++){
         if(g[i][c]==0){
             continue;
