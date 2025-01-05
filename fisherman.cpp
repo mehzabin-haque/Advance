@@ -1,115 +1,76 @@
 #include <iostream>
 #include <climits>
-#include <cstring> // For memset
+#include <cstring>
 using namespace std;
 
-// Constants
-const int MAX_N = 11;    // Maximum number of fishing spots (1-based indexing)
-const int MAX_P = 16;    // Maximum number of people per gate (assuming up to 15)
+static const int INF = INT_MAX;
 
-// Memoization table
-// dp[index][p0][p1][p2] stores the minimal distance sum for the state
-long long dp_table[MAX_N][MAX_P][MAX_P][MAX_P];
+int n;
+int gate[3];
+int people[3];
+int sumF;
 
-// Gates and people
-int n;                  // Number of fishing spots
-int gate[3];            // Positions of the 3 gates (0, 1, 2)
-int people_initial[3];  // Initial number of people at each gate
+static int dp[101][11][11][11];
 
-
-// DP Function with Memoization
-long long solve(int index, int p0, int p1, int p2){
-    // Base Cases
-    if(p0 == 0 && p1 == 0 && p2 == 0){
-        // All fishermen have been placed
+int solveMemo(int index, int p0, int p1, int p2) {
+    if (p0 + p1 + p2 == 0) {
         return 0;
     }
-    if(index > n){
-        // Reached beyond the last spot but still have fishermen to place
-        return LLONG_MAX / 2; // Use a large number to indicate invalid path
+    if (index > n) {
+        return INF;
+    }
+    int &res = dp[index][p0][p1][p2];
+    if (res != -1) {
+        return res;
     }
 
-    // Check if this state has already been computed
-    if(dp_table[index][p0][p1][p2] != -1){
-        return dp_table[index][p0][p1][p2];
-    }
+    int best = solveMemo(index + 1, p0, p1, p2);
 
-    // Initialize the minimum distance for this state to a large value
-    long long min_dist = LLONG_MAX / 2;
-
-    // Option 1: Place a fisherman from any gate (if available) at the current spot
-    for(int i = 0; i < 3; i++){
-        if((i == 0 && p0 > 0) || (i == 1 && p1 > 0) || (i == 2 && p2 > 0)){
-            // Assign one fisherman from gate 'i' to this spot
-            if(i == 0 && p0 > 0){
-                // Calculate distance: |gate position - current spot| + 1
-                long long distance = abs(gate[i] - index) + 1;
-                // Recurse for the next spot with one less fisherman at gate 'i'
-                long long temp = solve(index + 1, p0 - 1, p1, p2);
-                if(temp != LLONG_MAX / 2){
-                    min_dist = min(min_dist, distance + temp);
-                }
-            }
-            if(i == 1 && p1 > 0){
-                long long distance = abs(gate[i] - index) + 1;
-                long long temp = solve(index + 1, p0, p1 - 1, p2);
-                if(temp != LLONG_MAX / 2){
-                    min_dist = min(min_dist, distance + temp);
-                }
-            }
-            if(i == 2 && p2 > 0){
-                long long distance = abs(gate[i] - index) + 1;
-                long long temp = solve(index + 1, p0, p1, p2 - 1);
-                if(temp != LLONG_MAX / 2){
-                    min_dist = min(min_dist, distance + temp);
-                }
-            }
+    if (p0 > 0) {
+        int cost = abs(gate[0] - index) + 1;
+        int rec = solveMemo(index + 1, p0 - 1, p1, p2);
+        if (rec != INF) {
+            best = min(best, cost + rec);
         }
     }
 
-    // Option 2: Do not place any fisherman at the current spot
-    long long skip = solve(index + 1, p0, p1, p2);
-    min_dist = min(min_dist, skip);
+    if (p1 > 0) {
+        int cost = abs(gate[1] - index) + 1;
+        int rec = solveMemo(index + 1, p0, p1 - 1, p2);
+        if (rec != INF) {
+            best = min(best, cost + rec);
+        }
+    }
 
-    // Memoize the result
-    dp_table[index][p0][p1][p2] = min_dist;
+    if (p2 > 0) {
+        int cost = abs(gate[2] - index) + 1;
+        int rec = solveMemo(index + 1, p0, p1, p2 - 1);
+        if (rec != INF) {
+            best = min(best, cost + rec);
+        }
+    }
 
-    return min_dist;
+    res = best;
+    return res;
 }
 
-int main(){
-    // Initialize the memoization table with -1 (uncomputed states)
-    memset(dp_table, -1, sizeof(dp_table));
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
 
-    // Input reading
-    cin >> n; // Number of fishing spots
-
-    for(int i = 0; i < 3; i++){
-        cin >> gate[i]; // Positions of the 3 gates
+    cin >> n;
+    for (int i = 0; i < 3; i++) {
+        cin >> gate[i];
+    }
+    sumF = 0;
+    for (int i = 0; i < 3; i++){
+        cin >> people[i];
+        sumF += people[i];
     }
 
-    int sum = 0; // Total number of fishermen
-    for(int i = 0; i < 3; i++){
-        cin >> people_initial[i]; // Number of fishermen at each gate
-        sum += people_initial[i];
-    }
+    memset(dp, -1, sizeof(dp));
 
-    // Check if the total number of fishermen exceeds the number of spots
-    if(sum > n){
-        cout << -1 << endl; // Or handle as per problem constraints
-        return 0;
-    }
-
-    // Start solving from the first fishing spot with all fishermen unplaced
-    long long answer = solve(1, people_initial[0], people_initial[1], people_initial[2]);
-
-    // If answer is still a large number, it means it's impossible to place all fishermen
-    if(answer >= LLONG_MAX / 2){
-        cout << -1 << endl; // Or handle as per problem constraints
-    }
-    else{
-        cout << answer << endl;
-    }
-
+    int ans = solveMemo(1, people[0], people[1], people[2]);
+    cout << ans << "\n";
     return 0;
 }
