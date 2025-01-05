@@ -20,7 +20,8 @@
     ],
     "files.associations": {
       "*.embeddedhtml": "html",
-      "vector": "cpp"
+      "vector": "cpp",
+      "utility": "cpp"
     }
   }
   

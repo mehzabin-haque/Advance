@@ -1,112 +1,113 @@
 #include <iostream>
+#include <climits>
+#include <cstring>
 #include <vector>
-#include <queue>
 using namespace std;
 
-bool canReachGoalBFS(const vector<vector<int>> &grid, int N, int M, int d)
+using namespace std;
+typedef long long ll;
+int n, m;
+bool dfs(int r, int c, vector<vector<int>> &dp, vector<vector<int>> &vis, vector<vector<int>> &g)
 {
-  int startR = N - 1;
-  int startC = 0;
-
-  if (N == 0 || M == 0)
-    return false;
-
-  if (grid[startR][startC] == 0)
-    return false;
-
-  vector<vector<bool>> visited(N, vector<bool>(M, false));
-  visited[startR][startC] = true;
-
-  queue<pair<int, int>> q;
-  q.push({startR, startC});
-
-  while (!q.empty())
-  {
-    auto cell = q.front();
-    int r = cell.first;
-    int c = cell.second;
-    q.pop();
-
-    if (grid[r][c] == 3)
+    if (r == n - 1 && c == 0)
     {
-      return true;
+        return true;
     }
-
-    if (c - 1 >= 0)
+    if (dp[r][c] != -1)
     {
-      int nr = r;
-      int nc = c - 1;
-
-      if (!visited[nr][nc] && (grid[nr][nc] == 1 || grid[nr][nc] == 3))
-      {
-        visited[nr][nc] = true;
-        q.push({nr, nc});
-      }
+        return true;
     }
-
-    if (c + 1 < M)
+    int temp = INT_MAX;
+    vis[r][c] = 1;
+    for (int i = c - 1; i >= 0; i--)
     {
-      int nr = r;
-      int nc = c + 1;
-      if (!visited[nr][nc] && (grid[nr][nc] == 1 || grid[nr][nc] == 3))
-      {
-        visited[nr][nc] = true;
-        q.push({nr, nc});
-      }
-    }
-
-    for (int k = 1; k <= d; k++)
-    {
-      int nrUp = r - k;
-      if (nrUp >= 0)
-      {
-        if (!visited[nrUp][c] && (grid[nrUp][c] == 1 || grid[nrUp][c] == 3))
+        if (g[r][i] == 0)
+            break;
+        if (vis[r][i] == 0 && dfs(r, i, dp, vis, g))
         {
-          visited[nrUp][c] = true;
-          q.push({nrUp, c});
+            temp = min(temp, dp[r][i]);
         }
-      }
-
-      int nrDown = r + k;
-      if (nrDown < N)
-      {
-        if (!visited[nrDown][c] && (grid[nrDown][c] == 1 || grid[nrDown][c] == 3))
-        {
-          visited[nrDown][c] = true;
-          q.push({nrDown, c});
-        }
-      }
     }
-  }
-
-  return false;
+    for (int i = c + 1; i < m; i++)
+    {
+        if (g[r][i] == 0)
+            break;
+        if (vis[r][i] == 0 && dfs(r, i, dp, vis, g))
+        {
+            temp = min(temp, dp[r][i]);
+        }
+    }
+    for (int i = r - 1; i >= 0; i--)
+    {
+        if (g[i][c] == 0)
+            continue;
+        if (vis[i][c] == 0 && dfs(i, c, dp, vis, g))
+        {
+            temp = min(temp, max(dp[i][c], abs(r - i)));
+        }
+        else if (dp[i][c] != INT_MAX && dp[i][c] != -1)
+        {
+            temp = min(temp, max(dp[i][c], abs(r - i)));
+        }
+    }
+    for (int i = r + 1; i < n; i++)
+    {
+        if (g[i][c] == 0)
+            continue;
+        if (vis[i][c] == 0 && dfs(i, c, dp, vis, g))
+        {
+            temp = min(temp, max(dp[i][c], abs(r - i)));
+        }
+        else if (dp[i][c] != INT_MAX && dp[i][c] != -1)
+        {
+            temp = min(temp, max(dp[i][c], abs(r - i)));
+        }
+    }
+    // cout << r << " " << c << " " << temp << endl;
+    dp[r][c] = temp;
+    return temp != INT_MAX;
 }
-
 int main()
 {
-  int N, M;
-  cin >> N >> M;
-
-  vector<vector<int>> grid(N, vector<int>(M));
-  for (int r = 0; r < N; r++)
-  {
-    for (int c = 0; c < M; c++)
+    cin >> n >> m;
+    vector<vector<int>> g(n, vector<int>(m));
+    vector<vector<int>> vis(n, vector<int>(m, 0));
+    vector<vector<int>> dp(n, vector<int>(m, -1));
+    int x, y;
+    for (int i = 0; i < n; i++)
     {
-      cin >> grid[r][c];
+        for (int j = 0; j < m; j++)
+        {
+            cin >> g[i][j];
+            if (g[i][j] == 3)
+            {
+                x = i, y = j;
+            }
+        }
     }
-  }
-
-  int answer = -1;
-  for (int d = 0; d < N; d++)
-  {
-    if (canReachGoalBFS(grid, N, M, d))
-    {
-      answer = d;
-      break;
-    }
-  }
-
-  cout << answer << endl;
-
-  return 0;
+    dp[n - 1][0] = 0;
+    dfs(x, y, dp, vis, g);
+    cout << dp[x][y] << endl;
 }
+
+/*
+The problem statement is very confusing. But what we are ultimately asked is the minimum maximum distance we need to cross in a column sequentially to reach from the bottom left corner to the destination.
+
+For example,
+
+1001
+1000
+1111
+
+From (0,0) to reach (2,0), we need to jump from (0,0) to (1,0), then from (1,0) to (2,0). So the max distance we needed to ascend or descend is 1. But in order to reach (2,0) from (0,3),
+(0,3) -> (2,3)
+(2,3) -> (2,2)
+(2,3) -> (2,1)
+(2,3) -> (2,0)
+
+The maximum distance we needed to ascend/descend is 2. So the minimum maximum distance is 1
+
+Notice we can go left/right in a particular row if there is 1 consecutively, otherwise impossible. No such restriction in a column as long as there is 1 up/down in that column anywhere from a paeticular spot.
+
+So in this solution, we have first passed the destination position to know recursively what is the minimum maximum distance needed to reach source (n-1, 0). To utilize positions for which we know the source is unreachable or the distance is known, we can use dynamic programming.
+*/
