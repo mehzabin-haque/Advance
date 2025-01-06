@@ -50,13 +50,13 @@ int main(){
                    if(bomb_used == -1){
                        q.push({score,row,col,row});
                    }
-                   else if(bomb_used - row <=4){
-                        q.push({score,row,col,bomb_used});
-                   }
+                   // else if(bomb_used - row <=4){
+                   //      q.push({score,row,col,bomb_used});
+                   // }
                }
            }
         }
         
-        cout << "#" << t << " " << ans << endl;
+        cout << "#" << i << " " << ans << endl;
     }
 }
