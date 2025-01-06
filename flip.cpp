@@ -3,7 +3,7 @@ using namespace std;
 
 int main()
 {
-    int n,m,k, ans=INT_MIN;
+    int n,m,k, ans=0;
 
     cin>>n>>m>>k;
 
