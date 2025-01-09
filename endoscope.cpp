@@ -60,12 +60,12 @@ int main(){
     int t;
     cin>>t;
     while(t--){
-        int h,w,r,c,l;
+        int h,w,r,c,l; //height, width, row, col, len
         cin>>h>>w>>r>>c>>l;
         
         vector<vector<int>> grid(h,vector<int>(w));
         vector<vector<int>> visited(h,vector<int>(w,0));
-         vector<vector<int>>  dfsvisited(h,vector<int>(w,0));
+        vector<vector<int>> dfsvisited(h,vector<int>(w,0));
          
          for(int i=0;i<h;i++){
              for(int j=0;j<w;j++){

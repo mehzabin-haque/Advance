@@ -1,49 +1,91 @@
 #include<cstdio>
 #include<iostream>
 #include<vector>
-#include<algorithm>
-#include<string>
+#include<climits>
 using namespace std;
 
-int min_dist(vector<pair<int,int>> &coord, int n){
+int tsp(int source, int mask, const vector<vector<int>> &graph, vector<vector<int>> &dp);
+int manhattan_distance(pair<int, int> A, pair<int, int> B);
+int find_minimum_travel_for_salesman(const vector<pair<int, int>> &coordinates, int n);
 
-    int dist=0;
+int main()
+{
+  int num_of_test_cases = 10;
+  for (int tc = 1; tc <= num_of_test_cases; tc++)
+  {
+    int n, x, y;
 
-    vector<vector<int>> graph(n,vector<int>(n,0));
+    cin >> n;
 
-    for(int i=0;i<n;i++){
-        for(int j=i+1;j<n;j++){
-            graph[i][j] = abs(coord[i].first - coord[j].first) + abs(coord[i].second - coord[j].second);
-            graph[j][i] = graph[i][j];
-        }
+    vector<pair<int, int>> coordinates(n + 2);
+
+    n += 2;
+    cin >> x >> y;
+    coordinates[0] = {x, y};
+    cin >> x >> y;
+    coordinates[n - 1] = {x, y};
+
+    for (int i = 1; i < n - 1; i++)
+    {
+      cin >> x >> y;
+      coordinates[i] = {x, y};
     }
 
-    return dist;
+    cout << "# " << tc << " " << find_minimum_travel_for_salesman(coordinates, n) << endl;
+  }
+
+  return 0;
 }
 
-int main(){
-    int t;
-    cin>>t;
+int manhattan_distance(pair<int, int> A, pair<int, int> B)
+{
+  return abs(A.first - B.first) + abs(A.second - B.second);
+}
 
-    while(t--){
-        int n;
-        cin>>n;
-        n+=2;
-        vector<pair<int,int>> coord(n);
-        int x,y;
-        cin>>x,y;
-        coord[0] = {x,y};
-        int a,b;
-        cin>>a>>b;
-        coord[n-1]={a,b};
-
-        for(int i=1;i<n-1;i++){
-            int x,y;
-            cin>>x>>y;
-            coord[i] = {x,y};
-        }
-
-        cout<< min_dist(coord,n) << endl;
-
+int find_minimum_travel_for_salesman(const vector<pair<int, int>> &coordinates, int n)
+{
+  vector<vector<int>> graph(n, vector<int>(n, 0));
+  for (int i = 0; i < n; i++)
+  {
+    for (int j = i + 1; j < n; j++)
+    {
+      int distance = manhattan_distance(coordinates[i], coordinates[j]);
+      graph[i][j] = distance;
+      graph[j][i] = distance;
     }
+  }
+
+  vector<vector<int>> dp(1 << n, vector<int>(n, -1));
+
+  int result = tsp(0, 1, graph, dp);
+
+  return result;
+}
+
+int tsp(int source, int mask, const vector<vector<int>> &graph, vector<vector<int>> &dp)
+{
+  int n = graph.size();
+
+  if (mask == ((1 << n) - 1))
+  {
+    return graph[source][n - 1];
+  }
+
+  if (dp[mask][source] != -1)
+  {
+    return dp[mask][source];
+  }
+
+  int min_cost = INT_MAX;
+
+  for (int loc = 1; loc < n; loc++)
+  {
+    if (!(mask & (1 << loc)))
+    {
+      int cost = graph[source][loc] + tsp(loc, mask | (1 << loc), graph, dp);
+      min_cost = min(min_cost, cost);
+    }
+  }
+
+  return dp[mask][source] = min_cost;
 }

@@ -1,45 +1,48 @@
-#include <iostream>
-#include <vector>
-#include <climits>
-#include <algorithm>
+#include<iostream>
+#include<vector>
+#include<algorithm>
+#include<cstdio>
+#include<climits>
 using namespace std;
 
-int n;
-
-int ms(int left, int right, vector<int> &b, vector<vector<int>> &dp)
-{
-  if (left == right)
-    return 0;
-
-  if (dp[left][right] != -1)
-    return dp[left][right];
-
-  int msr = INT_MIN;
-
-  for (int i = left; i < right; i++)
-  {
-    int score;
-    if (left == 1 && right == n + 1)
-      score = b[i]  + ms(left, i, b, dp) + ms(i + 1, right, b, dp);
-    else
-      score = b[left - 1] * b[right] + ms(left, i, b, dp) + ms(i + 1, right, b, dp);
-
-    msr = max(msr, score);
-  }
-
-  return dp[left][right] = msr;
+int cal_score(vector<int> &b, vector<vector<int>> &dp, int start, int end, int n ){
+    
+    int max_score = INT_MIN, score=0;
+    
+    if(start>end){
+        return 0;
+    }
+    
+    if(dp[start][end]!=0){
+        return dp[start][end];
+    }
+    
+    for(int i=start;i<=end;i++){
+        if((start-1)==0 && ((end+1)==n+1)){
+            score = b[i]+ cal_score(b,dp,start,i-1,n)+cal_score(b,dp,i+1,end,n);
+        }
+        else{
+             score = b[start-1]*b[end+1] + cal_score(b,dp,start,i-1,n)+cal_score(b,dp,i+1,end,n);
+        }
+        
+         max_score = max(max_score,score);
+    }
+   
+    return dp[start][end] = max_score;
 }
-
-int main()
-{
-
-  cin >> n;
-  vector<int> b(n + 2, 1);
-
-  for (int i = 1; i <= n; i++)
-    cin >> b[i];
-
-  vector<vector<int>> dp(n + 2, vector<int>(n + 2, -1));
-
-  cout << ms(1, n + 1, b, dp);
+int main(){
+    int n;
+    cin>>n;
+    vector<int> b(n+2);
+    b[0]=1;
+    b[n+1]=1;
+    
+    for(int i=1;i<=n;i++){
+        cin>>b[i];
+    }
+    
+    vector<vector<int>> dp(n+2,vector<int>(n+2,0));
+    
+    cout << cal_score(b,dp,1,n,n) << endl;
+    return 0;
 }

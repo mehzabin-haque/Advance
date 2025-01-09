@@ -1,4 +1,10 @@
-#include<bits/stdc++.h>
+#include <iostream>
+#include <climits>
+#include <cstring> // For memset
+#include <vector>
+#include <algorithm>
+#include <unordered_map>
+
 using namespace std;
 
 int main()
