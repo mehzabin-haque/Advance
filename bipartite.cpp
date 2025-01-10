@@ -6,7 +6,7 @@ using namespace std;
 
 bool isBipartite = true;
 //cv=current vertex, cc=current color
-void checkBipartite(vector<vector<int>>& graph, int cv, int cc, vector<int>& color) {
+void checkBipartite(vector<vector<int>>& graph, int cv, int cc, vector<int> &color) {
     if (color[cv] != -1) {
         if(color[cv] != cc){
             isBipartite = false;

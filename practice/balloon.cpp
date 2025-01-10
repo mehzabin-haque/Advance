@@ -17,7 +17,7 @@ int cal_max_score(int start, int end,vector<int> &b,vector<vector<int>> &dp, int
     int max_score = INT_MIN, score=0;
     
     for(int i=start;i<=end;i++){
-        //you forgot this condition and the was confused about the i+1 and i-1 part
+        //you forgot this condition and was confused about the i+1 and i-1 part
         if((start-1)==0 && (end+1)==n+1){
             score = b[i]+ cal_max_score(i+1,end,b,dp,n)+cal_max_score(start,i-1,b,dp,n);
         }

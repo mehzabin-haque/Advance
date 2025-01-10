@@ -26,7 +26,7 @@ int main(){
         else if(current_level==k){
             string num_str = "";
             while(i<n && s[i]!='(' && s[i]!=')'){
-                num_str = num_str + s[i];
+                num_str += s[i];
                 i++;
             }
             sum += stoi(num_str);

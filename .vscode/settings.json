@@ -21,7 +21,8 @@
     "files.associations": {
       "*.embeddedhtml": "html",
       "vector": "cpp",
-      "utility": "cpp"
+      "utility": "cpp",
+      "ostream": "cpp"
     }
   }
   
