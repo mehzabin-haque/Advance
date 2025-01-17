@@ -22,7 +22,11 @@
       "*.embeddedhtml": "html",
       "vector": "cpp",
       "utility": "cpp",
-      "ostream": "cpp"
+      "ostream": "cpp",
+      "iostream": "cpp",
+      "algorithm": "cpp",
+      "limits": "cpp",
+      "xutility": "cpp"
     }
   }
   

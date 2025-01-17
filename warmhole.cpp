@@ -1,72 +1,90 @@
-#include<iostream>
-#include<cmath>
 #include<cstdio>
+#include<queue>
 #include<vector>
-#include<algorithm>
+#include <climits>
+#include<iostream>
+
 using namespace std;
 
-struct point{
-    int x,y;
-};
-struct wormhole{
-    point source,destination;
-    int value;
-};
+int main()
+{
+    int tt;
+    cin>>tt;
 
+    for(int  tc=0; tc<tt; tc++)
+    {
+        int n;
+        cin>>n;
+        n+=2;
 
+        int sourceX,sourceY,desX,desY,cost;
 
-int manhattan_dist(point a,point b){
-    return abs(a.x-b.x)+abs(a.y-b.y);
-}
+        cin>>sourceX>>sourceY;
+        cin>>desX>>desY;
 
-int solve(point source, int cost, point final_destination, const vector<wormhole> &wormholes, vector<int> &visited){
-    
-    int ans= cost+manhattan_dist(source,final_destination);
-    
-    for(int i=0;i<wormholes.size();i++){
-        if(!visited[i]){
-            visited[i]=1;
-            
-            //forward direction
-            ans=min(ans,solve(wormholes[i].destination, cost+manhattan_dist(source,wormholes[i].source)+wormholes[i].value, final_destination,wormholes,visited));
-             ans=min(ans,solve(wormholes[i].source, cost+manhattan_dist(source,wormholes[i].destination)+wormholes[i].value, final_destination,wormholes,visited));
-            
-            visited[i]=0;
+        vector<vector<int>>portal;
+        portal.push_back({sourceX,sourceY,sourceX,sourceY,0});
+        portal.push_back({desX,desY,desX,desY,0});
+
+        for(int i=1; i<n-1; i++)
+        {
+            int inX,inY,outX,outY;
+
+            cin>>inX>>inY>>outX>>outY>>cost;
+
+            portal.push_back({inX,inY,outX,outY,cost});
+            portal.push_back({outX,outY,inX,inY,cost});
         }
-    }
-    
-    //  cout<<"("<<source.x<<","<<source.y<<") -> ("<<final_destination.x<<","<<final_destination.y<<") ="<<ans<<endl;
-    return ans;
-}
-int min_cost_to_travel(point source,point destination,const vector<wormhole> &wormholes){
-    
-    int n = wormholes.size();
-    vector<int> visited(n,0);
-    
-    return solve(source,0,destination,wormholes,visited);
-}
 
-int main(){
-    
-    int t;
-    cin>>t;
-    for(int i=0;i<t;i++){
-        int num_of_wormholes;
-        cin>>num_of_wormholes;
-        
-        point source,destination;
-        cin>>source.x>>source.y>>destination.x>>destination.y;
-        
-        vector<wormhole> wormholes(num_of_wormholes);
-        
-        for(int i=0;i<num_of_wormholes;i++){
-            cin>>wormholes[i].source.x>> wormholes[i].source.y;
-            cin>>wormholes[i].destination.x>> wormholes[i].destination.y;
-            cin>>wormholes[i].value;
+        int totalNodes = portal.size();
+        vector<pair<int,int>>adjacencyList[totalNodes];
+        vector<bool>visited(totalNodes, false);
+        vector<int>distance(totalNodes, INT_MAX);
+
+        for(int i=0; i<totalNodes; i++)
+        {
+            for(int j=i+1; j<totalNodes; j++)
+            {
+                int w1 = abs(portal[i][2]-portal[j][0])+abs(portal[i][3]-portal[j][1])+portal[j][4]; //j
+                int w2 = abs(portal[j][2]-portal[i][0])+abs(portal[j][3]-portal[i][1])+portal[i][4];
+                adjacencyList[i].push_back({j,w1});
+                adjacencyList[j].push_back({i,w2});
+            }
         }
-        
-        cout<< min_cost_to_travel(source,destination,wormholes) <<endl;
-        
+
+        priority_queue<pair<int,int>, vector<pair<int,int>>, greater<pair<int,int>>> q;
+
+        q.push({0,0}); //  distance, node
+
+        distance[0]=0;
+
+        while(!q.empty())
+        {
+            int u = q.top().second;
+
+            q.pop();
+
+            if(visited[u])
+            {
+                continue;
+            }
+
+            visited[u]=true;
+
+            for( auto it : adjacencyList[u])
+            {
+                int v = it.first;
+                int w = it.second;
+
+                if(distance[u]+w< distance[v])
+                {
+                    distance[v]=distance[u]+w;
+                    q.push({distance[v],v});
+                }
+            }
+        }
+
+        cout<<distance[1]<<endl;
+
     }
-    return 0;
 }
